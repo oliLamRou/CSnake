@@ -6,6 +6,7 @@
     - ~~config a CMakeLists.txt~~
     - ~~basic control on 1 square~~
     - getting a snake to move around with some rules
+    - organize code with function and headers
 
 - Rule
     - Start with fix terminal 800x600 or so
