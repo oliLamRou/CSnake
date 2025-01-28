@@ -3,8 +3,7 @@
 
 typedef struct {
     int dx, dy;
-    int px [10];
-    int py [10];
+    int *px, *py;
 } Snake;
 
 Snake initSnake;
