@@ -2,6 +2,8 @@
 #include <SDL2/SDL_pixels.h>
 #include <stdio.h>
 
+#include "snake.h"
+
 int main() {
     // Initialize SDL
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
@@ -40,14 +42,6 @@ int main() {
 
     int size = 10;
     int n = 10;
-    typedef struct {
-        //direction
-        int dx, dy;
-
-        //tail
-        int px [10];
-        int py [10];
-    } Snake;
     
     Snake snake;
     snake.dx = 1;
@@ -58,9 +52,7 @@ int main() {
         snake.px[i] = snake.px[i-1] - size;
         snake.py[i] = snake.py[0];
     }
-    
-    
-    
+
     // Main loop
     SDL_Event event;
     int running = 1;    
@@ -99,21 +91,12 @@ int main() {
             if(_i == 0){
                 snake.px[0] = snake.px[0] > screenX ? snake.px[0] = 0 : snake.px[0] < 0 ? snake.px[0] = screenX : snake.px[0] + snake.dx * size;
                 snake.py[0] = snake.py[0] > screenY ? snake.py[0] = 0 : snake.py[0] < 0 ? snake.py[0] = screenY : snake.py[0] + snake.dy * size;
-                // snake.px[0] = snake.px[0] + snake.dx * size;
-                // snake.py[0] = snake.py[0] + snake.dy * size;
                 continue;
             }
             snake.px[_i] = snake.px[_i-1];
             snake.py[_i] = snake.py[_i-1];
             
         }
-
-        // printf("->");
-        // for (int i = 0; i < n; i++)
-        // {
-        //     printf("x: %d y: %d", snake.px[i], snake.py[i]);
-        // }        
-        // printf("\n");
 
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
