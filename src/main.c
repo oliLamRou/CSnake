@@ -6,7 +6,7 @@
 #include "asset.h"
 
 void clearScreen(SDL_Renderer *renderer);
-void snakePos(Snake *snake, Screen *screen);
+void screenLoop(Snake *snake, Screen *screen);
 
 int main() {
     //Init Game    
@@ -92,26 +92,16 @@ int main() {
             //head
             if(i == 0)
             {
-                snakePos(&snake, &screen);
-                // //if smaller then
-                // //if bigger then
-                // //else
-                // if(snake.px[i] > screen.x - snake.size){
-                //     snake.px[0] = 0;
-                // } else if(snake.px[0] < 0) {
-                //     snake.px[0] = screen.x - snake.size;
-                // } else {
-                //     snake.px[0] = snake.px[0] + snake.dx * snake.size;
-                // }
-                // // snake.px[0] = snake.px[0] > screen.x - snake.size ? snake.px[0] = snake.size : snake.px[0] < snake.size ? snake.px[0] = screen.x - snake.size : snake.px[0] + snake.dx * snake.size;
-                // snake.py[0] = snake.py[0] > screen.y ? snake.py[0] = 0 : snake.py[0] < 0 ? snake.py[0] = screen.y : snake.py[0] + snake.dy * snake.size;
+                screenLoop(&snake, &screen);
             } else {
                 snake.px[i] = snake.px[i-1];
                 snake.py[i] = snake.py[i-1];
+                if(snake.px[0] == snake.px[i] && snake.py[0] == snake.py[i]){
+                    printf("DONE!");
+                }
             }
         }
 
-        printf("%d\n", snake.px[0]);
         clearScreen(renderer);
 
         for (int i = 0; i < snake.len; i++)
@@ -152,7 +142,7 @@ void clearScreen(SDL_Renderer *renderer){
 }
 
 
-void snakePos(Snake *snake, Screen *screen){
+void screenLoop(Snake *snake, Screen *screen){
     int *p = snake->dx != 0 ? &snake->px[0] : &snake->py[0];
     int *s = snake->dx != 0 ? &screen->x : &screen->y;
     int *d = snake->dx != 0 ? &snake->dx : &snake->dy;
@@ -164,6 +154,4 @@ void snakePos(Snake *snake, Screen *screen){
     } else {
         *p = *p + *d * snake->size;
     }
-
-    printf("%d\n", *p);
 }
