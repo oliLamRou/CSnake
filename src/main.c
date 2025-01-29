@@ -6,6 +6,7 @@
 #include "asset.h"
 
 void clearScreen(SDL_Renderer *renderer);
+void snakePos(Snake *snake, Screen *screen);
 
 int main() {
     //Init Game    
@@ -88,16 +89,29 @@ int main() {
 
         for (int i = snake.len-1; i > -1; i--)
         {
+            //head
             if(i == 0)
             {
-                snake.px[0] = snake.px[0] > screen.x ? snake.px[0] = 0 : snake.px[0] < 0 ? snake.px[0] = screen.x : snake.px[0] + snake.dx * snake.size;
-                snake.py[0] = snake.py[0] > screen.y ? snake.py[0] = 0 : snake.py[0] < 0 ? snake.py[0] = screen.y : snake.py[0] + snake.dy * snake.size;
+                snakePos(&snake, &screen);
+                // //if smaller then
+                // //if bigger then
+                // //else
+                // if(snake.px[i] > screen.x - snake.size){
+                //     snake.px[0] = 0;
+                // } else if(snake.px[0] < 0) {
+                //     snake.px[0] = screen.x - snake.size;
+                // } else {
+                //     snake.px[0] = snake.px[0] + snake.dx * snake.size;
+                // }
+                // // snake.px[0] = snake.px[0] > screen.x - snake.size ? snake.px[0] = snake.size : snake.px[0] < snake.size ? snake.px[0] = screen.x - snake.size : snake.px[0] + snake.dx * snake.size;
+                // snake.py[0] = snake.py[0] > screen.y ? snake.py[0] = 0 : snake.py[0] < 0 ? snake.py[0] = screen.y : snake.py[0] + snake.dy * snake.size;
             } else {
                 snake.px[i] = snake.px[i-1];
                 snake.py[i] = snake.py[i-1];
             }
         }
 
+        printf("%d\n", snake.px[0]);
         clearScreen(renderer);
 
         for (int i = 0; i < snake.len; i++)
@@ -137,3 +151,19 @@ void clearScreen(SDL_Renderer *renderer){
     SDL_RenderClear(renderer);
 }
 
+
+void snakePos(Snake *snake, Screen *screen){
+    int *p = snake->dx != 0 ? &snake->px[0] : &snake->py[0];
+    int *s = snake->dx != 0 ? &screen->x : &screen->y;
+    int *d = snake->dx != 0 ? &snake->dx : &snake->dy;
+
+    if(*p > *s - snake->size){
+        *p = 0;
+    } else if(*p < 0) {
+        *p = *s - snake->size;
+    } else {
+        *p = *p + *d * snake->size;
+    }
+
+    printf("%d\n", *p);
+}
