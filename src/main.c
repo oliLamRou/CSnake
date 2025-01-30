@@ -65,23 +65,30 @@ int main() {
             } else if (event.type == SDL_KEYDOWN){
                 switch (event.key.keysym.sym) {
                 case SDLK_LEFT:
+                    if(snake.dx != 0){break;}
                     snake.dx = -1;
                     snake.dy = 0;
                     break;
                 
                 case SDLK_RIGHT:
+                    if(snake.dx != 0){break;}
                     snake.dx = 1;
                     snake.dy = 0;
                     break;
 
                 case SDLK_UP:
+                    if(snake.dy != 0){break;}
                     snake.dx = 0;
                     snake.dy = -1;
                     break;
 
                 case SDLK_DOWN:
+                    if(snake.dy != 0){break;}
                     snake.dx = 0;
                     snake.dy = 1;
+                    break;
+                case SDLK_RETURN:
+                    running = 0;
                     break;
                 }
             }
@@ -92,13 +99,12 @@ int main() {
             //head
             if(i == 0)
             {
+                // printf("Head\n");
                 screenLoop(&snake, &screen);
             } else {
+                // printf("Tail\n");
                 snake.px[i] = snake.px[i-1];
                 snake.py[i] = snake.py[i-1];
-                if(snake.px[0] == snake.px[i] && snake.py[0] == snake.py[i]){
-                    printf("DONE!");
-                }
             }
         }
 
@@ -106,16 +112,23 @@ int main() {
 
         for (int i = 0; i < snake.len; i++)
         {
+            //check collision
+            if(i != 0 && snake.px[0] == snake.px[i] && snake.py[0] == snake.py[i]){
+                snake = initSnake();
+                break;
+            }
+
             SDL_Rect square2 = {snake.px[i], snake.py[i], snake.size, snake.size};
             SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
             SDL_RenderFillRect(renderer, &square2);
         }
         
-        //Food
+        //Eat Food
         if(food.x == snake.px[0] && food.y == snake.py[0]){
             newFood(&food, &grid, &snake);
             snake.len ++;
             snake.px = realloc(snake.px, sizeof(int) * snake.len);
+            snake.py = realloc(snake.py, sizeof(int) * snake.len);
         }
 
         SDL_Rect sq = {food.x, food.y, snake.size, snake.size};
@@ -147,6 +160,7 @@ void screenLoop(Snake *snake, Screen *screen){
     int *s = snake->dx != 0 ? &screen->x : &screen->y;
     int *d = snake->dx != 0 ? &snake->dx : &snake->dy;
 
+    // printf("%d %d %d\n", *p, *s, *d);
     if(*p > *s - snake->size){
         *p = 0;
     } else if(*p < 0) {

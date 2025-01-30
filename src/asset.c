@@ -5,8 +5,21 @@
 
 //Food
 void newFood(Food *food, Grid *grid, Snake *snake){
-    food->x = (rand() % grid->x) * snake->size;
-    food->y = (rand() % grid->y) * snake->size;
+    int foodOnSnake = 1;
+    while (foodOnSnake)
+    {
+        food->x = (rand() % grid->x) * snake->size;
+        food->y = (rand() % grid->y) * snake->size;
+
+        for (int i = 0; i < snake->len; i++)
+        {
+            if(food->x != snake->px[0] || food->y != snake->py[0]){
+                foodOnSnake = 0;
+            } else {
+                printf("Food on Snake, generating new on");
+            }
+        }
+    }
 }
 
 //Food
