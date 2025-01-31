@@ -11,12 +11,12 @@ void newFood(Food *food, Grid *grid, Snake *snake){
         food->x = (rand() % grid->x) * snake->size;
         food->y = (rand() % grid->y) * snake->size;
 
+        foodOnSnake = 0;
         for (int i = 0; i < snake->len; i++)
         {
-            if(food->x != snake->px[0] || food->y != snake->py[0]){
-                foodOnSnake = 0;
-            } else {
-                printf("Food on Snake, generating new on");
+            if(food->x == snake->px[i] && food->y == snake->px[i]){
+                printf("Food on snake, respawn");
+                foodOnSnake = 1;
             }
         }
     }
@@ -39,4 +39,26 @@ Snake initSnake(){
     }
 
     return snake;
+}
+
+void moveHead(Snake *snake, Screen *screen){
+    if(snake->dx != 0){
+        snake->px[0] += snake->dx * snake->size;
+    } else {
+        snake->py[0] += snake->dy * snake->size;
+    }
+
+    //X
+    if(snake->px[0] > screen->x - snake->size){
+        snake->px[0] = 0;
+    } else if(snake->px[0] < 0){
+        snake->px[0] = screen->x - snake->size;
+    }
+
+    //Y
+    if(snake->py[0] > screen->y - snake->size){
+        snake->py[0] = 0;
+    } else if(snake->py[0] < 0){
+        snake->py[0] = screen->y - snake->size;
+    }
 }

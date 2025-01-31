@@ -18,5 +18,6 @@ typedef struct {
 } Food;
 
 void newFood(Food *food, Grid *grid, Snake *snake);
+void moveHead(Snake *snake, Screen *screen);
 
 #endif

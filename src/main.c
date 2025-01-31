@@ -6,8 +6,8 @@
 #include "asset.h"
 
 void clearScreen(SDL_Renderer *renderer);
-void screenLoop(Snake *snake, Screen *screen);
-int controle(SDL_Event *event, Snake *snake);
+void moveHead(Snake *snake, Screen *screen);
+void controle(SDL_Event *event, Snake *snake, int *running);
 void renderSquare(int px, int py, int size, int r, int g, int b, int a, SDL_Renderer *renderer);
 
 int main() {
@@ -62,46 +62,38 @@ int main() {
     int running = 1;    
     while (running) {
         //Controle
-        running = controle(&event, &snake);
+        controle(&event, &snake, &running);
 
-        //Food
-        if(food.x == snake.px[0] && food.y == snake.py[0]){
-            newFood(&food, &grid, &snake);
-            snake.len ++;
-            snake.px = realloc(snake.px, sizeof(int) * snake.len);
-            snake.py = realloc(snake.py, sizeof(int) * snake.len);
-        }
-
-        //Snake
-        for (int i = snake.len-1; i > -1; i--)
-        {
-            //head
-            if(i == 0)
-            {
-                // printf("Head\n");
-                screenLoop(&snake, &screen);
-            } else {
-                // printf("Tail\n");
-                snake.px[i] = snake.px[i-1];
-                snake.py[i] = snake.py[i-1];
-            }
-        }
-
-        //Render
         clearScreen(renderer);
 
-        for (int i = 0; i < snake.len; i++)
+        //Head
+        int hx = snake.px[0];
+        int hy = snake.py[0];    
+        moveHead(&snake, &screen);
+        renderSquare(snake.px[0], snake.py[0], snake.size, 255, 0, 0, 255, renderer);
+
+        //Tail, collision
+        for (int i = snake.len-1; i > 0; i--)
         {
-            //check collision
-            if(i != 0 && snake.px[0] == snake.px[i] && snake.py[0] == snake.py[i]){
+            snake.px[i] = i == 1 ? hx: snake.px[i-1];
+            snake.py[i] = i == 1 ? hy: snake.py[i-1];
+
+            if(snake.px[0] == snake.px[i] && snake.py[0] == snake.py[i]){
                 snake = initSnake();
                 break;
             }
 
             renderSquare(snake.px[i], snake.py[i], snake.size, 255, 0, 0, 255, renderer);
         }
-
-        renderSquare(food.x, food.y, snake.size, 0, 255, 0, 255, renderer);
+        
+        //food
+        if(food.x == snake.px[0] && food.y == snake.py[0]){
+            newFood(&food, &grid, &snake);
+            snake.len ++;
+            snake.px = realloc(snake.px, sizeof(int) * snake.len);
+            snake.py = realloc(snake.py, sizeof(int) * snake.len);
+        }
+        renderSquare(food.x, food.y, snake.size, 0, 255, 0, 255, renderer);        
         SDL_RenderPresent(renderer);
         SDL_Delay(60);
     }
@@ -120,30 +112,21 @@ void clearScreen(SDL_Renderer *renderer){
     SDL_RenderClear(renderer);
 }
 
-
-void screenLoop(Snake *snake, Screen *screen){
-    int *p = snake->dx != 0 ? &snake->px[0] : &snake->py[0];
-    int *s = snake->dx != 0 ? &screen->x : &screen->y;
-    int *d = snake->dx != 0 ? &snake->dx : &snake->dy;
-
-    // printf("%d %d %d\n", *p, *s, *d);
-    if(*p > *s - snake->size){
-        *p = 0;
-    } else if(*p < 0) {
-        *p = *s - snake->size;
-    } else {
-        *p = *p + *d * snake->size;
-    }
+void renderSquare(int px, int py, int size, int r, int g, int b, int a, SDL_Renderer *renderer)
+{
+    SDL_Rect square = {px, py, size, size};
+    SDL_SetRenderDrawColor(renderer, r, g, b, a);
+    SDL_RenderFillRect(renderer, &square);
+    return;    
 }
 
-int controle(SDL_Event *event, Snake *snake) 
+void controle(SDL_Event *event, Snake *snake, int *running) 
 {
-    int running = 1;
     while (SDL_PollEvent(event)) 
     {
         if (event->type == SDL_QUIT) 
         {
-            running = 0;
+            *running = 0;
         } else if (event->type == SDL_KEYDOWN){
             switch (event->key.keysym.sym) {
             case SDLK_LEFT:
@@ -170,18 +153,11 @@ int controle(SDL_Event *event, Snake *snake)
                 snake->dy = 1;
                 break;
             case SDLK_RETURN:
-                running = 0;
+                *running = 0;
                 break;
             }
         }
     }
-    return running;
+    return;
 }
 
-void renderSquare(int px, int py, int size, int r, int g, int b, int a, SDL_Renderer *renderer)
-{
-    SDL_Rect square = {px, py, size, size};
-    SDL_SetRenderDrawColor(renderer, r, g, b, a);
-    SDL_RenderFillRect(renderer, &square);
-    return;    
-}
