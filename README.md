@@ -11,6 +11,7 @@
     - food should reset if it take too long to catch
     - move every pixel but can only turn every (size)
     - ~~infinite window should be with border of size so it never goes out~~
+    - complile for different system, x86, arm
 
 - Rule
     - Start with fix terminal 800x600 or so
