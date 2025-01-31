@@ -7,6 +7,8 @@
 
 void clearScreen(SDL_Renderer *renderer);
 void screenLoop(Snake *snake, Screen *screen);
+int controle(SDL_Event *event, Snake *snake);
+void renderSquare(int px, int py, int size, int r, int g, int b, int a, SDL_Renderer *renderer);
 
 int main() {
     //Init Game    
@@ -59,41 +61,18 @@ int main() {
     SDL_Event event;
     int running = 1;    
     while (running) {
-        while (SDL_PollEvent(&event)) {
-            if (event.type == SDL_QUIT) {
-                running = 0;
-            } else if (event.type == SDL_KEYDOWN){
-                switch (event.key.keysym.sym) {
-                case SDLK_LEFT:
-                    if(snake.dx != 0){break;}
-                    snake.dx = -1;
-                    snake.dy = 0;
-                    break;
-                
-                case SDLK_RIGHT:
-                    if(snake.dx != 0){break;}
-                    snake.dx = 1;
-                    snake.dy = 0;
-                    break;
+        //Controle
+        running = controle(&event, &snake);
 
-                case SDLK_UP:
-                    if(snake.dy != 0){break;}
-                    snake.dx = 0;
-                    snake.dy = -1;
-                    break;
-
-                case SDLK_DOWN:
-                    if(snake.dy != 0){break;}
-                    snake.dx = 0;
-                    snake.dy = 1;
-                    break;
-                case SDLK_RETURN:
-                    running = 0;
-                    break;
-                }
-            }
+        //Food
+        if(food.x == snake.px[0] && food.y == snake.py[0]){
+            newFood(&food, &grid, &snake);
+            snake.len ++;
+            snake.px = realloc(snake.px, sizeof(int) * snake.len);
+            snake.py = realloc(snake.py, sizeof(int) * snake.len);
         }
 
+        //Snake
         for (int i = snake.len-1; i > -1; i--)
         {
             //head
@@ -108,6 +87,7 @@ int main() {
             }
         }
 
+        //Render
         clearScreen(renderer);
 
         for (int i = 0; i < snake.len; i++)
@@ -118,29 +98,15 @@ int main() {
                 break;
             }
 
-            SDL_Rect square2 = {snake.px[i], snake.py[i], snake.size, snake.size};
-            SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-            SDL_RenderFillRect(renderer, &square2);
-        }
-        
-        //Eat Food
-        if(food.x == snake.px[0] && food.y == snake.py[0]){
-            newFood(&food, &grid, &snake);
-            snake.len ++;
-            snake.px = realloc(snake.px, sizeof(int) * snake.len);
-            snake.py = realloc(snake.py, sizeof(int) * snake.len);
+            renderSquare(snake.px[i], snake.py[i], snake.size, 255, 0, 0, 255, renderer);
         }
 
-        SDL_Rect sq = {food.x, food.y, snake.size, snake.size};
-        SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
-        SDL_RenderFillRect(renderer, &sq);
-
+        renderSquare(food.x, food.y, snake.size, 0, 255, 0, 255, renderer);
         SDL_RenderPresent(renderer);
         SDL_Delay(60);
-
     }
 
-    // Cleanup
+    // Cleanup & Close
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(win);
     SDL_Quit();
@@ -168,4 +134,54 @@ void screenLoop(Snake *snake, Screen *screen){
     } else {
         *p = *p + *d * snake->size;
     }
+}
+
+int controle(SDL_Event *event, Snake *snake) 
+{
+    int running = 1;
+    while (SDL_PollEvent(event)) 
+    {
+        if (event->type == SDL_QUIT) 
+        {
+            running = 0;
+        } else if (event->type == SDL_KEYDOWN){
+            switch (event->key.keysym.sym) {
+            case SDLK_LEFT:
+                if(snake->dx != 0){break;}
+                snake->dx = -1;
+                snake->dy = 0;
+                break;
+            
+            case SDLK_RIGHT:
+                if(snake->dx != 0){break;}
+                snake->dx = 1;
+                snake->dy = 0;
+                break;
+
+            case SDLK_UP:
+                if(snake->dy != 0){break;}
+                snake->dx = 0;
+                snake->dy = -1;
+                break;
+
+            case SDLK_DOWN:
+                if(snake->dy != 0){break;}
+                snake->dx = 0;
+                snake->dy = 1;
+                break;
+            case SDLK_RETURN:
+                running = 0;
+                break;
+            }
+        }
+    }
+    return running;
+}
+
+void renderSquare(int px, int py, int size, int r, int g, int b, int a, SDL_Renderer *renderer)
+{
+    SDL_Rect square = {px, py, size, size};
+    SDL_SetRenderDrawColor(renderer, r, g, b, a);
+    SDL_RenderFillRect(renderer, &square);
+    return;    
 }
